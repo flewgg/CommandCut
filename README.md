@@ -19,6 +19,5 @@ There is no prebuilt binary yet. Please build manually:
 2. Build and run the `Command X` target.
 
 ## Security
-- App Sandbox enabled
-- No network access
-- No file access outside its sandbox
+
+The app is sandboxed and will NOT connect to the internet. It also doesn't have any file access entitlements.
