@@ -15,8 +15,17 @@ This was inspired by [Command X](https://sindresorhus.com/command-x). I built th
 
 ## Install (Manual Build)
 There is no prebuilt binary yet. Please build manually:
-1. Open `Command X.xcodeproj` in Xcode.
-2. Build and run the `Command X` target.
+1. Install Xcode from the App Store.
+2. Clone this repo and open `Command X.xcodeproj` in Xcode.
+3. Select the `Command X` target and click **Run**.
+4. Grant **Input Monitoring** permission if prompted.
+5. The app runs as a menubar item.
+
+## Build + Install Locally (No Gatekeeper Warnings)
+If you build the app on your own machine, macOS won’t quarantine it:
+1. In Xcode, use **Product > Archive** (Release build).
+2. Export the `.app` and move it to `/Applications`.
+3. Launch it once to set permissions.
 
 ## Security
 

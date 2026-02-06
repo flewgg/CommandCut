@@ -4,6 +4,7 @@ import SwiftUI
 struct Command_XApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @AppStorage("CutShortcutMode") private var shortcutMode = "command"
+    @State private var launchAtLogin = false
 
     var body: some Scene {
         MenuBarExtra("Command X", systemImage: "scissors") {
@@ -37,7 +38,17 @@ struct Command_XApp: App {
             }
             
             Divider()
-            
+
+            Toggle("Launch at Login", isOn: $launchAtLogin)
+                .onChange(of: launchAtLogin) { _, newValue in
+                    appDelegate.setLaunchAtLogin(newValue)
+                }
+                .onAppear {
+                    launchAtLogin = appDelegate.isLaunchAtLoginEnabled()
+                }
+
+            Divider()
+
            
             Button("Input Monitoring Settings...") {
                 appDelegate.openInputMonitoringSettings()
