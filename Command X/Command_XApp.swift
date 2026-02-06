@@ -12,28 +12,12 @@ struct Command_XApp: App {
                 Button {
                     shortcutMode = "command"
                 } label: {
-                    HStack {
-                        Text("Command")
-                        Spacer()
-                        Text("⌘X")
-                            .foregroundStyle(.secondary)
-                        if shortcutMode == "command" {
-                            Image(systemName: "checkmark")
-                        }
-                    }
+                    ShortcutRow(title: "Command", shortcut: "⌘X", selected: shortcutMode == "command")
                 }
                 Button {
                     shortcutMode = "control"
                 } label: {
-                    HStack {
-                        Text("Control")
-                        Spacer()
-                        Text("⌃X")
-                            .foregroundStyle(.secondary)
-                        if shortcutMode == "control" {
-                            Image(systemName: "checkmark")
-                        }
-                    }
+                    ShortcutRow(title: "Control", shortcut: "⌃X", selected: shortcutMode == "control")
                 }
             }
             
@@ -64,5 +48,25 @@ struct Command_XApp: App {
             Image(systemName: "scissors")
                 .imageScale(.medium)
         }
+    }
+}
+
+private struct ShortcutRow: View {
+    let title: String
+    let shortcut: String
+    let selected: Bool
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "checkmark")
+                .opacity(selected ? 1 : 0)
+                .foregroundStyle(.secondary)
+                .frame(width: 12)
+            Text(title)
+            Spacer()
+            Text(shortcut)
+                .foregroundStyle(.secondary)
+        }
+        .frame(minWidth: 200)
     }
 }
