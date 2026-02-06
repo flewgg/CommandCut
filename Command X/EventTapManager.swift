@@ -51,7 +51,6 @@ final class EventTapManager {
         }
 
         guard isFinderFrontmost() else {
-            isCutMode = false
             return false
         }
 
@@ -72,15 +71,15 @@ final class EventTapManager {
         let keyCode = Int(event.getIntegerValueField(.keyboardEventKeycode))
         switch keyCode {
         case kVK_ANSI_C:
-            isCutMode = false
+            setCutMode(false)
             return false
         case kVK_ANSI_X:
-            isCutMode = true
+            setCutMode(true)
             postKeyCombo(kVK_ANSI_C, flags: [.maskCommand])
             return true
         case kVK_ANSI_V:
             if isCutMode {
-                isCutMode = false
+                setCutMode(false)
                 postKeyCombo(kVK_ANSI_V, flags: [.maskCommand, .maskAlternate])
                 return true
             }
@@ -106,4 +105,17 @@ final class EventTapManager {
         keyUp?.post(tap: .cgSessionEventTap)
     }
 
+    private func setCutMode(_ active: Bool) {
+        guard isCutMode != active else { return }
+        isCutMode = active
+        NotificationCenter.default.post(
+            name: .commandXCutModeChanged,
+            object: nil,
+            userInfo: ["active": active]
+        )
+    }
+}
+
+extension Notification.Name {
+    static let commandXCutModeChanged = Notification.Name("CommandXCutModeChanged")
 }
