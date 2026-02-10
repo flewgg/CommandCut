@@ -17,7 +17,7 @@ struct Command_CutApp: App {
             )
         }
         label: {
-            Image(systemName: "scissors")
+            Image(systemName: "scissors.badge.ellipsis")
                 .imageScale(.medium)
         }
 
