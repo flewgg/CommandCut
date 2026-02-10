@@ -4,6 +4,11 @@ import ServiceManagement
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private let eventTapManager = EventTapManager()
+    private let hideDockIconKey = "HideDockIcon"
+
+    func applicationWillFinishLaunching(_ notification: Notification) {
+        applyDockIconVisibility(hidden: isDockIconHidden())
+    }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         requestInputMonitoringAccess()
@@ -36,5 +41,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func isLaunchAtLoginEnabled() -> Bool {
         return SMAppService.mainApp.status == .enabled
+    }
+
+    func setDockIconHidden(_ hidden: Bool) {
+        UserDefaults.standard.set(hidden, forKey: hideDockIconKey)
+        applyDockIconVisibility(hidden: hidden)
+    }
+
+    func isDockIconHidden() -> Bool {
+        UserDefaults.standard.bool(forKey: hideDockIconKey)
+    }
+
+    private func applyDockIconVisibility(hidden: Bool) {
+        let policy: NSApplication.ActivationPolicy = hidden ? .accessory : .regular
+        guard NSApplication.shared.activationPolicy() != policy else { return }
+        NSApplication.shared.setActivationPolicy(policy)
     }
 }
