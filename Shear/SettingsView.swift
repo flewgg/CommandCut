@@ -36,7 +36,7 @@ struct SettingsView: View {
             Divider()
 
             permissionRow(
-                title: "Accessibility (Post Events)",
+                title: "Accessibility",
                 granted: postEventAccessGranted,
                 details: "Needed to synthesize Option+Command+V for Finder move-paste."
             ) {
