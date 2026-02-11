@@ -9,9 +9,15 @@ struct ShearApp: App {
             MenuBarContent()
         }
         label: {
-            Image(systemName: "scissors.badge.ellipsis")
-                .imageScale(.medium)
+            MenuBarLabel()
         }
+
+        Window("Permissions Required", id: AppWindowID.permissions) {
+            PermissionsOnboardingView(appDelegate: appDelegate)
+        }
+        .defaultSize(width: 520, height: 350)
+        .windowResizability(.contentSize)
+        .windowStyle(.hiddenTitleBar)
 
         Window("Settings", id: AppWindowID.settings) {
             SettingsView(appDelegate: appDelegate)
@@ -29,12 +35,30 @@ struct ShearApp: App {
     }
 }
 
+private struct MenuBarLabel: View {
+    @Environment(\.openWindow) private var openWindow
+
+    var body: some View {
+        Image(systemName: "scissors.badge.ellipsis")
+            .imageScale(.medium)
+            .onAppear {
+                AppWindowRouter.install { id in
+                    openWindow(id: id)
+                    NSApplication.shared.activate(ignoringOtherApps: true)
+                }
+            }
+    }
+}
+
 private struct MenuBarContent: View {
     @Environment(\.openWindow) private var openWindow
 
     var body: some View {
+        windowButton(title: "Show Onboarding", systemImage: "hand.wave", id: AppWindowID.permissions)
         windowButton(title: "Settings", systemImage: "gearshape", id: AppWindowID.settings)
         windowButton(title: "Info", systemImage: "info.circle", id: AppWindowID.info)
+
+        Divider()
 
         Button {
             NSApplication.shared.terminate(nil)

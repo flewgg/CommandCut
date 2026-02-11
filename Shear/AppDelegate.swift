@@ -2,27 +2,58 @@ import ApplicationServices
 import Cocoa
 import ServiceManagement
 
+@MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
+    struct PermissionState {
+        let inputMonitoringGranted: Bool
+        let postEventAccessGranted: Bool
+
+        var allRequiredGranted: Bool {
+            inputMonitoringGranted && postEventAccessGranted
+        }
+    }
+
     private enum SettingsURL {
-        static let accessibility = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")
-        static let inputMonitoring = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_ListenEvent")
+        static let accessibility = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")!
+        static let inputMonitoring = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_ListenEvent")!
     }
 
     private let eventTapManager = EventTapManager()
+    private var didBecomeActiveObserver: NSObjectProtocol?
 
     func applicationWillFinishLaunching(_ notification: Notification) {
         applyDockIconVisibility(hidden: isDockIconHidden())
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        requestInputMonitoringAccess()
-        requestAccessibilityAccess()
-        eventTapManager.start()
+        didBecomeActiveObserver = NotificationCenter.default.addObserver(
+            forName: NSApplication.didBecomeActiveNotification,
+            object: NSApp,
+            queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor [weak self] in
+                self?.refreshPermissionState()
+            }
+        }
+
+        refreshPermissionState()
+
+        let defaults = UserDefaults.standard
+        let hasShownOnboarding = defaults.bool(forKey: AppDefaultsKey.hasShownPermissionsOnboarding)
+        if !hasShownOnboarding {
+            defaults.set(true, forKey: AppDefaultsKey.hasShownPermissionsOnboarding)
+            if !permissionState().allRequiredGranted {
+                DispatchQueue.main.async {
+                    AppWindowRouter.open(id: AppWindowID.permissions)
+                }
+            }
+        }
     }
 
-    func requestInputMonitoringAccess() {
-        if !CGPreflightListenEventAccess() {
-            _ = CGRequestListenEventAccess()
+    func applicationWillTerminate(_ notification: Notification) {
+        if let observer = didBecomeActiveObserver {
+            NotificationCenter.default.removeObserver(observer)
+            didBecomeActiveObserver = nil
         }
     }
 
@@ -30,22 +61,33 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         CGPreflightListenEventAccess()
     }
 
-    func requestAccessibilityAccess() {
-        if !CGPreflightPostEventAccess() {
-            _ = CGRequestPostEventAccess()
-        }
-    }
-
-    func hasAccessibilityAccess() -> Bool {
+    func hasPostEventAccess() -> Bool {
         CGPreflightPostEventAccess()
     }
 
-    func openAccessibilitySettings() {
-        openSystemSettings(SettingsURL.accessibility)
+    func permissionState() -> PermissionState {
+        PermissionState(
+            inputMonitoringGranted: hasInputMonitoringAccess(),
+            postEventAccessGranted: hasPostEventAccess()
+        )
     }
 
-    func openInputMonitoringSettings() {
-        openSystemSettings(SettingsURL.inputMonitoring)
+    func refreshPermissionState() {
+        if permissionState().allRequiredGranted {
+            eventTapManager.start()
+        } else {
+            eventTapManager.stop()
+            eventTapManager.start()
+        }
+    }
+
+    func openSettings(for permission: AppPermission) {
+        switch permission {
+        case .inputMonitoring:
+            openSystemSettings(SettingsURL.inputMonitoring)
+        case .postEvents:
+            openSystemSettings(SettingsURL.accessibility)
+        }
     }
 
     @discardableResult
@@ -82,8 +124,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         NSApplication.shared.setActivationPolicy(policy)
     }
 
-    private func openSystemSettings(_ url: URL?) {
-        guard let url else { return }
+    private func openSystemSettings(_ url: URL) {
         NSWorkspace.shared.open(url)
     }
 }
