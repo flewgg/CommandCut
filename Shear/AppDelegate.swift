@@ -58,7 +58,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             }
             return isLaunchAtLoginEnabled() == enabled
         } catch {
-            NSLog("Command Cut: failed to update launch at login: %@", error.localizedDescription)
+            NSLog("Shear: failed to update launch at login: %@", error.localizedDescription)
             return false
         }
     }

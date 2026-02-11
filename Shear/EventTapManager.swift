@@ -68,7 +68,7 @@ final class EventTapManager {
             callback: callback,
             userInfo: refcon
         ) else {
-            NSLog("Command Cut: failed to create event tap (will retry)")
+            NSLog("Shear: failed to create event tap (will retry)")
             scheduleRetry()
             return
         }
@@ -89,7 +89,7 @@ final class EventTapManager {
         if !inputMonitoringGranted || !accessibilityGranted {
             if !hasLoggedMissingPermissions {
                 NSLog(
-                    "Command Cut: waiting for permissions (Input Monitoring: %@, Accessibility: %@)",
+                    "Shear: waiting for permissions (Input Monitoring: %@, Accessibility: %@)",
                     inputMonitoringGranted ? "granted" : "missing",
                     accessibilityGranted ? "granted" : "missing"
                 )
@@ -116,7 +116,7 @@ final class EventTapManager {
     private func reenableEventTap() {
         if let tap = eventTap {
             CGEvent.tapEnable(tap: tap, enable: true)
-            NSLog("Command Cut: event tap was disabled and has been re-enabled")
+            NSLog("Shear: event tap was disabled and has been re-enabled")
         } else {
             scheduleRetry()
         }

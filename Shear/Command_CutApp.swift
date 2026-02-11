@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct Command_CutApp: App {
+struct ShearApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
 
     var body: some Scene {
@@ -59,21 +59,21 @@ private struct MenuBarContent: View {
 }
 
 private struct InfoPopupView: View {
-    private let repositoryURL = URL(string: "https://github.com/flewgg/CommandCut")!
+    private let repositoryURL = URL(string: "https://github.com/flewgg/Shear")!
     private let creditsURL = URL(string: "https://github.com/flewgg")!
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Command Cut")
+            Text("Shear")
                 .font(.headline)
 
             Text("Version \(appVersionDisplay)")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
 
-            Divider()
-
             Link("GitHub Repository", destination: repositoryURL)
+            
+            Divider()
 
             HStack(spacing: 10) {
                 Image("CreditsAvatar")
@@ -83,7 +83,7 @@ private struct InfoPopupView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 8))
 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("flewgg")
+                    Text("flew")
                     Link("github.com/flewgg", destination: creditsURL)
                         .font(.caption)
                 }
