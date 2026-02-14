@@ -2,6 +2,16 @@
 
 Shear is a tiny menubar app for macOS that enables **Cut (⌘X)** and **Paste (⌘V)** in Finder, similar to Windows/Linux.
 
+## Install
+
+Homebrew:
+```bash
+brew install --cask flewgg/tap/shear
+```
+
+Or download [directly from GitHub](https://github.com/flewgg/Shear/releases/latest).
+
+
 ## How It Works
 - When Finder is frontmost:
   - Your selected modifier shortcut + `X` triggers a copy
